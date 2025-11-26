@@ -1,3 +1,23 @@
+import subprocess
+import sys
+import os
+
+def install_dependencies():
+    """Installs dependencies from requirements.txt if they are missing."""
+    requirements_file = os.path.join(os.path.dirname(__file__), 'requirements.txt')
+    if os.path.exists(requirements_file):
+        print("Checking and installing dependencies...")
+        try:
+            # pip install -r requirements.txt handles checking if packages are already installed
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", requirements_file])
+        except subprocess.CalledProcessError as e:
+            print(f"Error installing dependencies: {e}")
+    else:
+        print("requirements.txt not found.")
+
+# Run dependency check before importing other modules
+install_dependencies()
+
 import pygame
 from pygame.locals import *
 from OpenGL.GL import *
