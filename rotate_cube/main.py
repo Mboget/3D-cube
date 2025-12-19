@@ -2,6 +2,26 @@ import subprocess
 import sys
 import os
 
+def activate_virtual_env():
+    """Activates the virtual environment if not already active."""
+    venv_dir = os.path.join(os.path.dirname(__file__), 'venv')
+    if sys.platform == 'win32':
+        python_executable = os.path.join(venv_dir, 'Scripts', 'python.exe')
+    else:
+        python_executable = os.path.join(venv_dir, 'bin', 'python')
+
+    # Normalize paths for comparison
+    if os.path.exists(python_executable):
+        if os.path.abspath(sys.executable) != os.path.abspath(python_executable):
+            print(f"Switching to virtual environment: {python_executable}")
+            # Re-execute the script with the venv python
+            try:
+                os.execv(python_executable, [python_executable] + sys.argv)
+            except OSError as e:
+                print(f"Failed to switch to venv: {e}")
+    else:
+        print("Virtual environment not found. Continuing with system Python.")
+
 def install_dependencies():
     """Installs dependencies from requirements.txt if they are missing."""
     requirements_file = os.path.join(os.path.dirname(__file__), 'requirements.txt')
@@ -14,6 +34,9 @@ def install_dependencies():
             print(f"Error installing dependencies: {e}")
     else:
         print("requirements.txt not found.")
+
+# Ensure we are in the virtual environment
+activate_virtual_env()
 
 # Run dependency check before importing other modules
 install_dependencies()
